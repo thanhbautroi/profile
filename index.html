@@ -647,12 +647,13 @@
         }
         /* gallery */
         
+        /* gallery — desktop: grid, mobile: horizontal scroll */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px
         }
-        
+
         .g-item {
             border-radius: 16px;
             overflow: hidden;
@@ -663,12 +664,12 @@
             border: 1px solid var(--line);
             transition: transform .3s, border-color .3s
         }
-        
+
         .g-item:hover {
             transform: translateY(-5px);
             border-color: rgba(168, 85, 247, .45)
         }
-        
+
         .g-item img {
             width: 100%;
             height: 100%;
@@ -676,15 +677,13 @@
             transition: transform .4s;
             display: block
         }
-        
-        .g-item:hover img {
-            transform: scale(1.06)
-        }
-        
+
+        .g-item:hover img { transform: scale(1.06) }
+
         .g-item .ov {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to top, rgba(7, 7, 13, .88), transparent);
+            background: linear-gradient(to top, rgba(7, 7, 13, .92), transparent);
             opacity: 0;
             transition: opacity .3s;
             padding: 18px;
@@ -692,20 +691,34 @@
             flex-direction: column;
             justify-content: flex-end
         }
-        
-        .g-item:hover .ov {
-            opacity: 1
-        }
-        
-        .g-item .ov .gt {
-            font-weight: 600;
-            font-size: .92rem
-        }
-        
-        .g-item .ov .gc {
-            font-size: .78rem;
-            color: var(--muted);
-            margin-top: 3px
+
+        .g-item:hover .ov { opacity: 1 }
+
+        .g-item .ov .gt { font-weight: 600; font-size: .92rem }
+        .g-item .ov .gc { font-size: .78rem; color: var(--muted); margin-top: 3px }
+
+        /* mobile: horizontal swipe */
+        @media(max-width: 680px) {
+            #gallery .wrap { padding: 0 }
+            #gallery .s-head { padding: 0 24px }
+            .gallery-grid {
+                display: flex;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+                gap: 12px;
+                padding: 4px 24px 16px;
+                scrollbar-width: none
+            }
+            .gallery-grid::-webkit-scrollbar { display: none }
+            .g-item {
+                flex-shrink: 0;
+                width: 82vw;
+                aspect-ratio: 3/4;
+                scroll-snap-align: start;
+                border-radius: 20px
+            }
+            .g-item .ov { opacity: 1 }
         }
         /* lightbox */
         
