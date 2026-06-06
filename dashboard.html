@@ -8,14 +8,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700;800;900&family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07070d;--bg2:#0c0c18;--ink:#e9e9f5;--muted:#8a8aa3;--cyan:#22d3ee;--violet:#a855f7;--violet2:#7c3aed;--line:rgba(255,255,255,.08);--card:rgba(255,255,255,.025)}
+:root{--bg:#07070d;--ink:#e9e9f5;--muted:#8a8aa3;--cyan:#22d3ee;--violet:#a855f7;--violet2:#7c3aed;--line:rgba(255,255,255,.08);--card:rgba(255,255,255,.025)}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:'Sora',sans-serif;min-height:100vh}
 
 .layout{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
 @media(max-width:900px){.layout{grid-template-columns:1fr}}
 
-/* --- SIDEBAR --- */
 .sidebar{background:rgba(255,255,255,.03);border-right:1px solid var(--line);padding:28px 24px;
   display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow-y:auto}
 @media(max-width:900px){.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}}
@@ -26,7 +25,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Sora',sans-serif;min-hei
   color:var(--violet);padding:2px 8px;border-radius:20px;margin-left:6px;
   font-family:'Sora',sans-serif;font-weight:600;vertical-align:middle}
 
-.s-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:-4px}
+.s-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px}
 
 .upload-area{border:2px dashed var(--line);border-radius:14px;padding:22px 16px;text-align:center;
   cursor:pointer;transition:border-color .25s,background .25s;color:var(--muted);font-size:.88rem;
@@ -55,10 +54,10 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;margin-botto
 .btn-add:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(168,85,247,.4)}
 .btn-add:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
-.storage-bar{margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
-.storage-label{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted);margin-bottom:6px}
-.bar-bg{background:var(--line);border-radius:10px;height:3px}
-.bar-fill{height:3px;border-radius:10px;transition:width .3s;background:linear-gradient(90deg,var(--violet),var(--cyan))}
+.progress-wrap{display:none;margin-top:10px}
+.progress-bar-bg{background:var(--line);border-radius:10px;height:4px}
+.progress-bar-fill{height:4px;border-radius:10px;background:linear-gradient(90deg,var(--violet),var(--cyan));width:0%;transition:width .2s}
+.progress-label{font-size:.76rem;color:var(--muted);margin-top:6px;text-align:center}
 
 .s-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;
   text-decoration:none;color:var(--muted);font-size:.86rem;transition:background .2s,color .2s;
@@ -66,7 +65,6 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;margin-botto
 .s-link:hover{background:var(--card);color:var(--ink)}
 .s-link.danger:hover{color:#f87171;background:rgba(248,113,113,.08)}
 
-/* --- MAIN --- */
 .main{padding:36px 36px;overflow-y:auto}
 @media(max-width:600px){.main{padding:20px 16px}}
 
@@ -92,7 +90,10 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;margin-botto
 .empty{text-align:center;padding:80px 0;color:var(--muted)}
 .empty .eicon{font-size:3rem;margin-bottom:16px;display:block}
 
-/* toast */
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,rgba(255,255,255,.05) 50%,var(--card) 75%);
+  background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:14px;height:200px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
 .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:12px;font-size:.86rem;
   transform:translateY(60px);opacity:0;transition:all .3s;z-index:200;backdrop-filter:blur(12px);
   background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3)}
@@ -102,8 +103,6 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;margin-botto
 </head>
 <body>
 <div class="layout">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="logo">MT<span>.</span><span class="badge">Dashboard</span></div>
 
@@ -113,40 +112,38 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;margin-botto
       <div class="upload-area" id="uploadArea">
         <span class="upload-icon">🖼️</span>
         <div>Kéo thả hoặc <b style="color:var(--violet)">chọn ảnh</b></div>
-        <small>JPG, PNG, WEBP, GIF...</small>
+        <small>JPG, PNG, WEBP...</small>
         <input type="file" id="fileInput" accept="image/*">
         <img id="previewImg" src="" alt="preview">
       </div>
 
       <div class="or-line">hoặc nhập URL</div>
-
-      <input class="form-input" type="url" id="imgUrl" placeholder="https://... hoặc img/gallery/...">
+      <input class="form-input" type="url" id="imgUrl" placeholder="https://...">
       <input class="form-input" type="text" id="imgTitle" placeholder="Tiêu đề ảnh *">
       <textarea class="form-input" id="imgCaption" placeholder="Mô tả (tùy chọn)"></textarea>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">Đang tải lên...</div>
+      </div>
 
       <p class="form-err" id="formErr"></p>
       <button class="btn-add" type="submit" id="submitBtn">+ Thêm vào bộ sưu tập</button>
     </form>
 
-    <div class="storage-bar">
-      <div class="storage-label"><span>Bộ nhớ đã dùng</span><span id="storageUsed">0 KB</span></div>
-      <div class="bar-bg"><div class="bar-fill" id="storageBar" style="width:0%"></div></div>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:4px">
+    <div style="display:flex;flex-direction:column;gap:4px;margin-top:auto">
       <a href="index.html" class="s-link">🏠 Về trang chủ</a>
       <button class="s-link danger" id="logoutBtn">🚪 Đăng xuất</button>
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
     <div class="main-header">
       <h1>Bộ sưu tập ảnh</h1>
       <span class="count-badge" id="countBadge">0 ảnh</span>
     </div>
     <div id="dashGrid" class="dash-grid"></div>
-    <div id="emptyMsg" class="empty">
+    <div id="emptyMsg" class="empty" style="display:none">
       <span class="eicon">📷</span>
       <p>Chưa có ảnh nào. Thêm ảnh đầu tiên!</p>
     </div>
@@ -155,16 +152,29 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;margin-botto
 
 <div class="toast" id="toast"></div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-// Auth guard
 if(sessionStorage.getItem('mt_auth')!=='1') location.href='login.html';
 
-const KEY='mt_gallery';
-function getGallery(){ return JSON.parse(localStorage.getItem(KEY)||'[]'); }
-function saveGallery(arr){ localStorage.setItem(KEY,JSON.stringify(arr)); }
+// Firebase init
+firebase.initializeApp({
+  apiKey:"AIzaSyBkS-XaN5oaUTh1st_Gf3NB7xZoXMqJGgc",
+  authDomain:"thanbautroi-ede0c.firebaseapp.com",
+  projectId:"thanbautroi-ede0c",
+  storageBucket:"thanbautroi-ede0c.firebasestorage.app",
+  messagingSenderId:"784971627810",
+  appId:"1:784971627810:web:9e83f0f9643a36a8c5b97b"
+});
+const db = firebase.firestore();
+
+// Cloudinary config
+const CLOUD = 'drszxhscf';
+const PRESET = 'thanhbautroi';
 
 // Toast
-function toast(msg,isErr=false){
+function toast(msg, isErr=false){
   const el=document.getElementById('toast');
   el.textContent=msg;
   el.className='toast'+(isErr?' err':'');
@@ -172,76 +182,73 @@ function toast(msg,isErr=false){
   setTimeout(()=>el.classList.remove('show'),3000);
 }
 
-// Storage indicator
-function updateStorage(){
-  const raw=localStorage.getItem(KEY)||'';
-  const bytes=new Blob([raw]).size;
-  const max=5*1024*1024;
-  const pct=Math.min(bytes/max*100,100);
-  document.getElementById('storageUsed').textContent=
-    bytes>1024*1024?(bytes/1024/1024).toFixed(1)+' MB':Math.round(bytes/1024)+' KB';
-  const bar=document.getElementById('storageBar');
-  bar.style.width=pct+'%';
-  bar.style.background=pct>80?'linear-gradient(90deg,#f87171,#fb923c)':'linear-gradient(90deg,var(--violet),var(--cyan))';
-}
-
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-function render(){
-  const items=getGallery();
+// Render gallery từ Firestore (realtime)
+db.collection('gallery').orderBy('createdAt','desc').onSnapshot(snapshot=>{
+  const items=snapshot.docs.map(d=>({id:d.id,...d.data()}));
   document.getElementById('countBadge').textContent=items.length+' ảnh';
-  document.getElementById('emptyMsg').style.display=items.length?'none':'block';
-  const fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='140'%3E%3Crect fill='%230c0c18' width='200' height='140'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%238a8aa3' font-size='13' font-family='sans-serif'%3EKhông tải được ảnh%3C/text%3E%3C/svg%3E";
-  document.getElementById('dashGrid').innerHTML=items.map((item,i)=>`
+  const empty=document.getElementById('emptyMsg');
+  const grid=document.getElementById('dashGrid');
+
+  if(!items.length){
+    grid.innerHTML='';
+    empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+  grid.innerHTML=items.map(item=>`
     <div class="dash-card">
-      <img src="${esc(item.src)}" alt="${esc(item.title)}" onerror="this.src='${fallback}'">
+      <img src="${esc(item.imageUrl)}" alt="${esc(item.title)}" loading="lazy"
+        onerror="this.style.background='#0c0c18';this.style.height='140px'">
       <div class="info">
         <strong title="${esc(item.title)}">${esc(item.title)}</strong>
-        <span>${item.date}</span>
+        <span>${item.date||''}</span>
       </div>
-      <button class="del" onclick="del(${i})">Xóa</button>
+      <button class="del" onclick="del('${item.id}')">Xóa</button>
     </div>
   `).join('');
-  updateStorage();
+}, err=>{
+  console.error(err);
+  toast('Không thể tải dữ liệu: '+err.message, true);
+});
+
+// Xóa ảnh
+async function del(id){
+  if(!confirm('Xóa ảnh này khỏi bộ sưu tập?')) return;
+  try{
+    await db.collection('gallery').doc(id).delete();
+    toast('Đã xóa ảnh!');
+  }catch(e){ toast('Lỗi xóa: '+e.message,true); }
 }
 
-function del(i){
-  if(!confirm('Xóa ảnh này khỏi bộ sưu tập?'))return;
-  const items=getGallery();
-  items.splice(i,1);
-  saveGallery(items);
-  render();
-  toast('Đã xóa ảnh!');
-}
-
-// Compress image via canvas
-function compress(file){
-  return new Promise((res,rej)=>{
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      const img=new Image();
-      img.onload=()=>{
-        const maxW=1200;
-        const r=Math.min(maxW/img.width,1);
-        const c=document.createElement('canvas');
-        c.width=img.width*r; c.height=img.height*r;
-        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-        res(c.toDataURL('image/jpeg',.78));
-      };
-      img.onerror=rej;
-      img.src=ev.target.result;
+// Upload lên Cloudinary
+async function uploadCloudinary(file, onProgress){
+  return new Promise((resolve,reject)=>{
+    const xhr=new XMLHttpRequest();
+    const fd=new FormData();
+    fd.append('file',file);
+    fd.append('upload_preset',PRESET);
+    xhr.upload.onprogress=e=>{
+      if(e.lengthComputable) onProgress(Math.round(e.loaded/e.total*100));
     };
-    reader.onerror=rej;
-    reader.readAsDataURL(file);
+    xhr.onload=()=>{
+      const res=JSON.parse(xhr.responseText);
+      if(res.secure_url) resolve(res.secure_url);
+      else reject(new Error(res.error?.message||'Upload thất bại'));
+    };
+    xhr.onerror=()=>reject(new Error('Lỗi kết nối'));
+    xhr.open('POST',`https://api.cloudinary.com/v1_1/${CLOUD}/image/upload`);
+    xhr.send(fd);
   });
 }
 
-// File input preview
+// File preview
 const fileInput=document.getElementById('fileInput');
 const previewImg=document.getElementById('previewImg');
 fileInput.addEventListener('change',()=>{
   const f=fileInput.files[0];
-  if(!f)return;
+  if(!f) return;
   previewImg.src=URL.createObjectURL(f);
   previewImg.style.display='block';
   document.getElementById('imgUrl').value='';
@@ -260,7 +267,7 @@ area.addEventListener('drop',e=>{
   }
 });
 
-// Add form
+// Submit form
 document.getElementById('addForm').onsubmit=async function(e){
   e.preventDefault();
   const title=document.getElementById('imgTitle').value.trim();
@@ -268,28 +275,52 @@ document.getElementById('addForm').onsubmit=async function(e){
   const urlVal=document.getElementById('imgUrl').value.trim();
   const file=fileInput.files[0];
   const errEl=document.getElementById('formErr');
+
   if(!title){errEl.textContent='Vui lòng nhập tiêu đề!';return;}
   if(!file&&!urlVal){errEl.textContent='Vui lòng chọn ảnh hoặc nhập URL!';return;}
   errEl.textContent='';
+
   const btn=document.getElementById('submitBtn');
-  btn.disabled=true;btn.textContent='Đang xử lý...';
+  const pw=document.getElementById('progressWrap');
+  const pf=document.getElementById('progressFill');
+  const pl=document.getElementById('progressLabel');
+  btn.disabled=true;
+
   try{
-    const src=file?await compress(file):urlVal;
-    const items=getGallery();
-    items.unshift({id:Date.now(),src,title,caption,date:new Date().toLocaleDateString('vi-VN')});
-    saveGallery(items);
-    render();
+    let imageUrl=urlVal;
+    if(file){
+      pw.style.display='block';
+      btn.textContent='Đang tải lên...';
+      imageUrl=await uploadCloudinary(file,pct=>{
+        pf.style.width=pct+'%';
+        pl.textContent='Đang tải lên... '+pct+'%';
+      });
+      pf.style.width='100%';
+      pl.textContent='Xong! Đang lưu...';
+    } else {
+      btn.textContent='Đang lưu...';
+    }
+
+    await db.collection('gallery').add({
+      imageUrl,
+      title,
+      caption,
+      date: new Date().toLocaleDateString('vi-VN'),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
     document.getElementById('addForm').reset();
-    previewImg.style.display='none';previewImg.src='';
+    previewImg.style.display='none';
+    previewImg.src='';
     toast('Đã thêm ảnh thành công! ✓');
   }catch(err){
-    if(err.name==='QuotaExceededError'||String(err).includes('quota')){
-      toast('Bộ nhớ đầy! Hãy xóa bớt ảnh hoặc dùng URL thay vì upload.',true);
-    }else{
-      toast('Lỗi: '+err.message,true);
-    }
+    toast('Lỗi: '+err.message, true);
+    errEl.textContent=err.message;
   }finally{
-    btn.disabled=false;btn.textContent='+ Thêm vào bộ sưu tập';
+    btn.disabled=false;
+    btn.textContent='+ Thêm vào bộ sưu tập';
+    pw.style.display='none';
+    pf.style.width='0%';
   }
 };
 
@@ -297,8 +328,6 @@ document.getElementById('logoutBtn').onclick=function(){
   sessionStorage.removeItem('mt_auth');
   location.href='login.html';
 };
-
-render();
 </script>
 </body>
 </html>

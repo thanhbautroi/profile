@@ -1003,61 +1003,82 @@
             threshold: .12
         });
         document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-        // gallery from localStorage
-        (function() {
-                const items = JSON.parse(localStorage.getItem('mt_gallery') || '[]');
-                if (!items.length) return;
-                const sec = document.getElementById('gallery');
-                const grid = document.getElementById('galleryGrid');
-                sec.style.display = 'block';
-                const fallback = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='195'%3E%3Crect fill='%230c0c18' width='260' height='195'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%238a8aa3' font-size='13' font-family='sans-serif'%3EKhông tải được ảnh%3C/text%3E%3C/svg%3E";
+        // gallery from Firestore
+        </script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+        <script>
+        if(!firebase.apps.length){
+          firebase.initializeApp({
+            apiKey:"AIzaSyBkS-XaN5oaUTh1st_Gf3NB7xZoXMqJGgc",
+            authDomain:"thanbautroi-ede0c.firebaseapp.com",
+            projectId:"thanbautroi-ede0c",
+            storageBucket:"thanbautroi-ede0c.firebasestorage.app",
+            messagingSenderId:"784971627810",
+            appId:"1:784971627810:web:9e83f0f9643a36a8c5b97b"
+          });
+        }
+        (function(){
+          const db=firebase.firestore();
+          const sec=document.getElementById('gallery');
+          const grid=document.getElementById('galleryGrid');
+          const lb=document.getElementById('lb');
+          const lbImg=document.getElementById('lbImg');
+          const lbTitle=document.getElementById('lbTitle');
+          const lbCaption=document.getElementById('lbCaption');
+          const lbCounter=document.getElementById('lbCounter');
+          let items=[], cur=0;
 
-                function esc(s) {
-                    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-                }
-                grid.innerHTML = items.map((item, i) => `
-    <div class="g-item reveal" data-idx="${i}">
-      <img src="${esc(item.src)}" alt="${esc(item.title)}" onerror="this.src='${fallback}'">
-      <div class="ov"><div class="gt">${esc(item.title)}</div>${item.caption?`<div class="gc">${esc(item.caption)}</div>`:''}</div>
-    </div>
-  `).join('');
+          function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-  // Re-observe new reveal elements
-  document.querySelectorAll('#galleryGrid .reveal').forEach(el=>io.observe(el));
+          function renderGallery(){
+            if(!items.length){sec.style.display='none';return;}
+            sec.style.display='block';
+            grid.innerHTML=items.map((item,i)=>`
+              <div class="g-item reveal" data-idx="${i}">
+                <img src="${esc(item.imageUrl)}" alt="${esc(item.title)}" loading="lazy">
+                <div class="ov">
+                  <div class="gt">${esc(item.title)}</div>
+                  ${item.caption?`<div class="gc">${esc(item.caption)}</div>`:''}
+                </div>
+              </div>
+            `).join('');
+            document.querySelectorAll('#galleryGrid .reveal').forEach(el=>io.observe(el));
+          }
 
-  // Lightbox
-  let cur=0;
-  const lb=document.getElementById('lb');
-  const lbImg=document.getElementById('lbImg');
-  const lbTitle=document.getElementById('lbTitle');
-  const lbCaption=document.getElementById('lbCaption');
-  const lbCounter=document.getElementById('lbCounter');
-  function open(i){
-    cur=i;
-    const item=items[i];
-    lbImg.src=item.src;
-    lbTitle.textContent=item.title;
-    lbCaption.textContent=item.caption||'';
-    lbCounter.textContent=(i+1)+' / '+items.length;
-    lb.classList.add('open');
-    document.body.style.overflow='hidden';
-  }
-  function close(){lb.classList.remove('open');document.body.style.overflow='';}
-  grid.addEventListener('click',e=>{
-    const el=e.target.closest('.g-item');
-    if(el)open(+el.dataset.idx);
-  });
-  document.getElementById('lbClose').onclick=close;
-  document.getElementById('lbPrev').onclick=()=>open((cur-1+items.length)%items.length);
-  document.getElementById('lbNext').onclick=()=>open((cur+1)%items.length);
-  lb.addEventListener('click',e=>{if(e.target===lb)close();});
-  document.addEventListener('keydown',e=>{
-    if(!lb.classList.contains('open'))return;
-    if(e.key==='Escape')close();
-    if(e.key==='ArrowLeft')open((cur-1+items.length)%items.length);
-    if(e.key==='ArrowRight')open((cur+1)%items.length);
-  });
-})();
+          // Lightbox
+          function open(i){
+            cur=i;
+            const item=items[i];
+            lbImg.src=item.imageUrl;
+            lbTitle.textContent=item.title;
+            lbCaption.textContent=item.caption||'';
+            lbCounter.textContent=(i+1)+' / '+items.length;
+            lb.classList.add('open');
+            document.body.style.overflow='hidden';
+          }
+          function close(){lb.classList.remove('open');document.body.style.overflow='';}
+          grid.addEventListener('click',e=>{
+            const el=e.target.closest('.g-item');
+            if(el) open(+el.dataset.idx);
+          });
+          document.getElementById('lbClose').onclick=close;
+          document.getElementById('lbPrev').onclick=()=>open((cur-1+items.length)%items.length);
+          document.getElementById('lbNext').onclick=()=>open((cur+1)%items.length);
+          lb.addEventListener('click',e=>{if(e.target===lb)close();});
+          document.addEventListener('keydown',e=>{
+            if(!lb.classList.contains('open'))return;
+            if(e.key==='Escape')close();
+            if(e.key==='ArrowLeft')open((cur-1+items.length)%items.length);
+            if(e.key==='ArrowRight')open((cur+1)%items.length);
+          });
+
+          // Load realtime từ Firestore
+          db.collection('gallery').orderBy('createdAt','desc').onSnapshot(snapshot=>{
+            items=snapshot.docs.map(d=>({id:d.id,...d.data()}));
+            renderGallery();
+          });
+        })();
 
 // parallax glow
 document.addEventListener('mousemove',e=>{
