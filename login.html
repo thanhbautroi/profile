@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đăng nhập — MT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700;800;900&family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07070d;--ink:#e9e9f5;--muted:#8a8aa3;--cyan:#22d3ee;--violet:#a855f7;--violet2:#7c3aed;--line:rgba(255,255,255,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Sora',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.glow{position:fixed;border-radius:50%;filter:blur(120px);opacity:.45;z-index:0;pointer-events:none}
+.glow.v{width:520px;height:520px;background:var(--violet2);top:-180px;left:-120px}
+.glow.c{width:480px;height:480px;background:var(--cyan);bottom:-200px;right:-140px;opacity:.3}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.04;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{position:relative;z-index:2;width:100%;max-width:420px;padding:24px}
+.card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:24px;padding:44px 40px;backdrop-filter:blur(20px)}
+.logo{font-family:'Space Mono',monospace;font-weight:700;font-size:1.2rem;letter-spacing:-1px;margin-bottom:32px}
+.logo span{color:var(--cyan)}
+h2{font-family:'Be Vietnam Pro',sans-serif;font-weight:700;font-size:1.8rem;margin-bottom:6px}
+.sub{color:var(--muted);font-size:.9rem;margin-bottom:32px}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
+.field input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;padding:13px 16px;color:var(--ink);font-family:'Sora',sans-serif;font-size:.95rem;outline:none;transition:border-color .25s,background .25s}
+.field input:focus{border-color:rgba(168,85,247,.6);background:rgba(168,85,247,.05)}
+.field input::placeholder{color:var(--muted)}
+.err{color:#f87171;font-size:.82rem;min-height:20px;margin-bottom:12px}
+.btn{width:100%;padding:15px;border:none;border-radius:40px;cursor:pointer;font-size:.95rem;font-weight:600;background:linear-gradient(120deg,var(--violet),var(--cyan));color:#07070d;font-family:'Sora',sans-serif;transition:transform .25s,box-shadow .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(168,85,247,.4)}
+.back{display:block;text-align:center;margin-top:24px;color:var(--muted);font-size:.85rem;text-decoration:none;transition:color .25s}
+.back:hover{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="glow v"></div>
+<div class="glow c"></div>
+<div class="grain"></div>
+<div class="wrap">
+  <div class="card">
+    <div class="logo">MT<span>.</span></div>
+    <h2>Đăng nhập</h2>
+    <p class="sub">Truy cập trang quản lý bộ sưu tập</p>
+    <form id="form" novalidate>
+      <div class="field">
+        <label>Tên đăng nhập</label>
+        <input type="text" id="u" placeholder="username" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Mật khẩu</label>
+        <input type="password" id="p" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <p class="err" id="err"></p>
+      <button class="btn" type="submit">Đăng nhập →</button>
+    </form>
+    <a href="index.html" class="back">← Về trang chủ</a>
+  </div>
+</div>
+<script>
+if(sessionStorage.getItem('mt_auth')==='1')location.href='dashboard.html';
+document.getElementById('form').onsubmit=function(e){
+  e.preventDefault();
+  const u=document.getElementById('u').value.trim();
+  const p=document.getElementById('p').value;
+  const creds=JSON.parse(localStorage.getItem('mt_creds')||'{"u":"thanh","p":"thanh2005"}');
+  if(u===creds.u&&p===creds.p){
+    sessionStorage.setItem('mt_auth','1');
+    location.href='dashboard.html';
+  }else{
+    document.getElementById('err').textContent='Sai tên đăng nhập hoặc mật khẩu!';
+    document.getElementById('p').value='';
+  }
+};
+</script>
+</body>
+</html>

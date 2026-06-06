@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Mạnh Thành</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700;800;900&family=Sora:wght@300;400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07070d;--bg2:#0c0c18;--ink:#e9e9f5;--muted:#8a8aa3;--cyan:#22d3ee;--violet:#a855f7;--violet2:#7c3aed;--line:rgba(255,255,255,.08);--card:rgba(255,255,255,.025)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'Sora',sans-serif;min-height:100vh}
+
+.layout{display:grid;grid-template-columns:320px 1fr;min-height:100vh}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* --- SIDEBAR --- */
+.sidebar{background:rgba(255,255,255,.03);border-right:1px solid var(--line);padding:28px 24px;
+  display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow-y:auto}
+@media(max-width:900px){.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}}
+
+.logo{font-family:'Space Mono',monospace;font-weight:700;font-size:1.05rem;letter-spacing:-1px}
+.logo span{color:var(--cyan)}
+.badge{font-size:.68rem;background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.3);
+  color:var(--violet);padding:2px 8px;border-radius:20px;margin-left:6px;
+  font-family:'Sora',sans-serif;font-weight:600;vertical-align:middle}
+
+.s-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:-4px}
+
+.upload-area{border:2px dashed var(--line);border-radius:14px;padding:22px 16px;text-align:center;
+  cursor:pointer;transition:border-color .25s,background .25s;color:var(--muted);font-size:.88rem;
+  position:relative}
+.upload-area:hover,.upload-area.drag{border-color:rgba(168,85,247,.5);background:rgba(168,85,247,.05);color:var(--ink)}
+.upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:1.8rem;margin-bottom:6px;display:block}
+#previewImg{width:100%;border-radius:10px;margin-top:10px;max-height:140px;object-fit:cover;display:none}
+
+.or-line{text-align:center;color:var(--muted);font-size:.78rem;position:relative;margin:4px 0}
+.or-line::before,.or-line::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:var(--line)}
+.or-line::before{left:0}.or-line::after{right:0}
+
+.form-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;
+  padding:11px 14px;color:var(--ink);font-family:'Sora',sans-serif;font-size:.88rem;
+  outline:none;transition:border-color .25s;margin-bottom:10px}
+.form-input:focus{border-color:rgba(168,85,247,.5)}
+.form-input::placeholder{color:var(--muted)}
+textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;margin-bottom:0}
+
+.form-err{color:#f87171;font-size:.78rem;min-height:18px;margin:6px 0}
+
+.btn-add{width:100%;padding:13px;border:none;border-radius:40px;cursor:pointer;font-size:.88rem;font-weight:600;
+  background:linear-gradient(120deg,var(--violet),var(--cyan));color:#07070d;
+  font-family:'Sora',sans-serif;transition:transform .2s,box-shadow .2s}
+.btn-add:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(168,85,247,.4)}
+.btn-add:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.storage-bar{margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.storage-label{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted);margin-bottom:6px}
+.bar-bg{background:var(--line);border-radius:10px;height:3px}
+.bar-fill{height:3px;border-radius:10px;transition:width .3s;background:linear-gradient(90deg,var(--violet),var(--cyan))}
+
+.s-link{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;
+  text-decoration:none;color:var(--muted);font-size:.86rem;transition:background .2s,color .2s;
+  border:none;background:transparent;cursor:pointer;width:100%;text-align:left}
+.s-link:hover{background:var(--card);color:var(--ink)}
+.s-link.danger:hover{color:#f87171;background:rgba(248,113,113,.08)}
+
+/* --- MAIN --- */
+.main{padding:36px 36px;overflow-y:auto}
+@media(max-width:600px){.main{padding:20px 16px}}
+
+.main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+.main-header h1{font-family:'Be Vietnam Pro',sans-serif;font-size:1.7rem;font-weight:700;letter-spacing:-1px}
+.count-badge{font-family:'Space Mono',monospace;font-size:.78rem;color:var(--cyan);
+  background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.2);padding:5px 14px;border-radius:20px}
+
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.dash-card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  position:relative;transition:border-color .25s,transform .25s}
+.dash-card:hover{border-color:rgba(168,85,247,.35);transform:translateY(-3px)}
+.dash-card img{width:100%;height:140px;object-fit:cover;display:block}
+.dash-card .info{padding:11px 13px}
+.dash-card .info strong{font-size:.88rem;font-weight:600;display:block;margin-bottom:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-card .info span{font-size:.74rem;color:var(--muted)}
+.dash-card .del{position:absolute;top:7px;right:7px;background:rgba(7,7,13,.75);
+  border:1px solid rgba(248,113,113,.35);color:#f87171;border-radius:8px;
+  padding:4px 10px;font-size:.72rem;cursor:pointer;transition:background .2s;backdrop-filter:blur(4px)}
+.dash-card .del:hover{background:rgba(248,113,113,.25)}
+
+.empty{text-align:center;padding:80px 0;color:var(--muted)}
+.empty .eicon{font-size:3rem;margin-bottom:16px;display:block}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:12px;font-size:.86rem;
+  transform:translateY(60px);opacity:0;transition:all .3s;z-index:200;backdrop-filter:blur(12px);
+  background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3)}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">MT<span>.</span><span class="badge">Dashboard</span></div>
+
+    <div class="s-label">Thêm ảnh mới</div>
+
+    <form id="addForm" novalidate>
+      <div class="upload-area" id="uploadArea">
+        <span class="upload-icon">🖼️</span>
+        <div>Kéo thả hoặc <b style="color:var(--violet)">chọn ảnh</b></div>
+        <small>JPG, PNG, WEBP, GIF...</small>
+        <input type="file" id="fileInput" accept="image/*">
+        <img id="previewImg" src="" alt="preview">
+      </div>
+
+      <div class="or-line">hoặc nhập URL</div>
+
+      <input class="form-input" type="url" id="imgUrl" placeholder="https://... hoặc img/gallery/...">
+      <input class="form-input" type="text" id="imgTitle" placeholder="Tiêu đề ảnh *">
+      <textarea class="form-input" id="imgCaption" placeholder="Mô tả (tùy chọn)"></textarea>
+
+      <p class="form-err" id="formErr"></p>
+      <button class="btn-add" type="submit" id="submitBtn">+ Thêm vào bộ sưu tập</button>
+    </form>
+
+    <div class="storage-bar">
+      <div class="storage-label"><span>Bộ nhớ đã dùng</span><span id="storageUsed">0 KB</span></div>
+      <div class="bar-bg"><div class="bar-fill" id="storageBar" style="width:0%"></div></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <a href="index.html" class="s-link">🏠 Về trang chủ</a>
+      <button class="s-link danger" id="logoutBtn">🚪 Đăng xuất</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="main-header">
+      <h1>Bộ sưu tập ảnh</h1>
+      <span class="count-badge" id="countBadge">0 ảnh</span>
+    </div>
+    <div id="dashGrid" class="dash-grid"></div>
+    <div id="emptyMsg" class="empty">
+      <span class="eicon">📷</span>
+      <p>Chưa có ảnh nào. Thêm ảnh đầu tiên!</p>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Auth guard
+if(sessionStorage.getItem('mt_auth')!=='1') location.href='login.html';
+
+const KEY='mt_gallery';
+function getGallery(){ return JSON.parse(localStorage.getItem(KEY)||'[]'); }
+function saveGallery(arr){ localStorage.setItem(KEY,JSON.stringify(arr)); }
+
+// Toast
+function toast(msg,isErr=false){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast'+(isErr?' err':'');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+
+// Storage indicator
+function updateStorage(){
+  const raw=localStorage.getItem(KEY)||'';
+  const bytes=new Blob([raw]).size;
+  const max=5*1024*1024;
+  const pct=Math.min(bytes/max*100,100);
+  document.getElementById('storageUsed').textContent=
+    bytes>1024*1024?(bytes/1024/1024).toFixed(1)+' MB':Math.round(bytes/1024)+' KB';
+  const bar=document.getElementById('storageBar');
+  bar.style.width=pct+'%';
+  bar.style.background=pct>80?'linear-gradient(90deg,#f87171,#fb923c)':'linear-gradient(90deg,var(--violet),var(--cyan))';
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function render(){
+  const items=getGallery();
+  document.getElementById('countBadge').textContent=items.length+' ảnh';
+  document.getElementById('emptyMsg').style.display=items.length?'none':'block';
+  const fallback="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='140'%3E%3Crect fill='%230c0c18' width='200' height='140'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%238a8aa3' font-size='13' font-family='sans-serif'%3EKhông tải được ảnh%3C/text%3E%3C/svg%3E";
+  document.getElementById('dashGrid').innerHTML=items.map((item,i)=>`
+    <div class="dash-card">
+      <img src="${esc(item.src)}" alt="${esc(item.title)}" onerror="this.src='${fallback}'">
+      <div class="info">
+        <strong title="${esc(item.title)}">${esc(item.title)}</strong>
+        <span>${item.date}</span>
+      </div>
+      <button class="del" onclick="del(${i})">Xóa</button>
+    </div>
+  `).join('');
+  updateStorage();
+}
+
+function del(i){
+  if(!confirm('Xóa ảnh này khỏi bộ sưu tập?'))return;
+  const items=getGallery();
+  items.splice(i,1);
+  saveGallery(items);
+  render();
+  toast('Đã xóa ảnh!');
+}
+
+// Compress image via canvas
+function compress(file){
+  return new Promise((res,rej)=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const maxW=1200;
+        const r=Math.min(maxW/img.width,1);
+        const c=document.createElement('canvas');
+        c.width=img.width*r; c.height=img.height*r;
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        res(c.toDataURL('image/jpeg',.78));
+      };
+      img.onerror=rej;
+      img.src=ev.target.result;
+    };
+    reader.onerror=rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+// File input preview
+const fileInput=document.getElementById('fileInput');
+const previewImg=document.getElementById('previewImg');
+fileInput.addEventListener('change',()=>{
+  const f=fileInput.files[0];
+  if(!f)return;
+  previewImg.src=URL.createObjectURL(f);
+  previewImg.style.display='block';
+  document.getElementById('imgUrl').value='';
+});
+
+// Drag & drop
+const area=document.getElementById('uploadArea');
+area.addEventListener('dragover',e=>{e.preventDefault();area.classList.add('drag')});
+area.addEventListener('dragleave',()=>area.classList.remove('drag'));
+area.addEventListener('drop',e=>{
+  e.preventDefault();area.classList.remove('drag');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/')){
+    const dt=new DataTransfer();dt.items.add(f);fileInput.files=dt.files;
+    previewImg.src=URL.createObjectURL(f);previewImg.style.display='block';
+  }
+});
+
+// Add form
+document.getElementById('addForm').onsubmit=async function(e){
+  e.preventDefault();
+  const title=document.getElementById('imgTitle').value.trim();
+  const caption=document.getElementById('imgCaption').value.trim();
+  const urlVal=document.getElementById('imgUrl').value.trim();
+  const file=fileInput.files[0];
+  const errEl=document.getElementById('formErr');
+  if(!title){errEl.textContent='Vui lòng nhập tiêu đề!';return;}
+  if(!file&&!urlVal){errEl.textContent='Vui lòng chọn ảnh hoặc nhập URL!';return;}
+  errEl.textContent='';
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='Đang xử lý...';
+  try{
+    const src=file?await compress(file):urlVal;
+    const items=getGallery();
+    items.unshift({id:Date.now(),src,title,caption,date:new Date().toLocaleDateString('vi-VN')});
+    saveGallery(items);
+    render();
+    document.getElementById('addForm').reset();
+    previewImg.style.display='none';previewImg.src='';
+    toast('Đã thêm ảnh thành công! ✓');
+  }catch(err){
+    if(err.name==='QuotaExceededError'||String(err).includes('quota')){
+      toast('Bộ nhớ đầy! Hãy xóa bớt ảnh hoặc dùng URL thay vì upload.',true);
+    }else{
+      toast('Lỗi: '+err.message,true);
+    }
+  }finally{
+    btn.disabled=false;btn.textContent='+ Thêm vào bộ sưu tập';
+  }
+};
+
+document.getElementById('logoutBtn').onclick=function(){
+  sessionStorage.removeItem('mt_auth');
+  location.href='login.html';
+};
+
+render();
+</script>
+</body>
+</html>
