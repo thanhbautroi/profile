@@ -646,14 +646,14 @@
             margin-top: 60px
         }
         /* gallery */
-        
         /* gallery — desktop: grid, mobile: horizontal scroll */
+        
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 16px
         }
-
+        
         .g-item {
             border-radius: 16px;
             overflow: hidden;
@@ -664,12 +664,12 @@
             border: 1px solid var(--line);
             transition: transform .3s, border-color .3s
         }
-
+        
         .g-item:hover {
             transform: translateY(-5px);
             border-color: rgba(168, 85, 247, .45)
         }
-
+        
         .g-item img {
             width: 100%;
             height: 100%;
@@ -677,9 +677,11 @@
             transition: transform .4s;
             display: block
         }
-
-        .g-item:hover img { transform: scale(1.06) }
-
+        
+        .g-item:hover img {
+            transform: scale(1.06)
+        }
+        
         .g-item .ov {
             position: absolute;
             inset: 0;
@@ -691,16 +693,30 @@
             flex-direction: column;
             justify-content: flex-end
         }
-
-        .g-item:hover .ov { opacity: 1 }
-
-        .g-item .ov .gt { font-weight: 600; font-size: .92rem }
-        .g-item .ov .gc { font-size: .78rem; color: var(--muted); margin-top: 3px }
-
+        
+        .g-item:hover .ov {
+            opacity: 1
+        }
+        
+        .g-item .ov .gt {
+            font-weight: 600;
+            font-size: .92rem
+        }
+        
+        .g-item .ov .gc {
+            font-size: .78rem;
+            color: var(--muted);
+            margin-top: 3px
+        }
         /* mobile: horizontal swipe */
+        
         @media(max-width: 680px) {
-            #gallery .wrap { padding: 0 }
-            #gallery .s-head { padding: 0 24px }
+            #gallery .wrap {
+                padding: 0
+            }
+            #gallery .s-head {
+                padding: 0 24px
+            }
             .gallery-grid {
                 display: flex;
                 overflow-x: auto;
@@ -710,7 +726,9 @@
                 padding: 4px 24px 16px;
                 scrollbar-width: none
             }
-            .gallery-grid::-webkit-scrollbar { display: none }
+            .gallery-grid::-webkit-scrollbar {
+                display: none
+            }
             .g-item {
                 flex-shrink: 0;
                 width: 82vw;
@@ -718,7 +736,9 @@
                 scroll-snap-align: start;
                 border-radius: 20px
             }
-            .g-item .ov { opacity: 1 }
+            .g-item .ov {
+                opacity: 1
+            }
         }
         /* lightbox */
         
@@ -836,7 +856,7 @@
     <div class="grain"></div>
 
     <nav>
-        <div class="logo">MT<span>.</span></div>
+        <div class="logo">Thành Bầu Trời<span>.</span></div>
         <div class="nav-links">
             <a href="#about">Giới thiệu</a>
             <a href="#skills">Kỹ năng</a>
@@ -1017,37 +1037,43 @@
         });
         document.querySelectorAll('.reveal').forEach(el => io.observe(el));
         // gallery from Firestore
-        </script>
-        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-        <script>
-        if(!firebase.apps.length){
-          firebase.initializeApp({
-            apiKey:"AIzaSyBkS-XaN5oaUTh1st_Gf3NB7xZoXMqJGgc",
-            authDomain:"thanbautroi-ede0c.firebaseapp.com",
-            projectId:"thanbautroi-ede0c",
-            storageBucket:"thanbautroi-ede0c.firebasestorage.app",
-            messagingSenderId:"784971627810",
-            appId:"1:784971627810:web:9e83f0f9643a36a8c5b97b"
-          });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+        if (!firebase.apps.length) {
+            firebase.initializeApp({
+                apiKey: "AIzaSyBkS-XaN5oaUTh1st_Gf3NB7xZoXMqJGgc",
+                authDomain: "thanbautroi-ede0c.firebaseapp.com",
+                projectId: "thanbautroi-ede0c",
+                storageBucket: "thanbautroi-ede0c.firebasestorage.app",
+                messagingSenderId: "784971627810",
+                appId: "1:784971627810:web:9e83f0f9643a36a8c5b97b"
+            });
         }
-        (function(){
-          const db=firebase.firestore();
-          const sec=document.getElementById('gallery');
-          const grid=document.getElementById('galleryGrid');
-          const lb=document.getElementById('lb');
-          const lbImg=document.getElementById('lbImg');
-          const lbTitle=document.getElementById('lbTitle');
-          const lbCaption=document.getElementById('lbCaption');
-          const lbCounter=document.getElementById('lbCounter');
-          let items=[], cur=0;
+        (function() {
+                const db = firebase.firestore();
+                const sec = document.getElementById('gallery');
+                const grid = document.getElementById('galleryGrid');
+                const lb = document.getElementById('lb');
+                const lbImg = document.getElementById('lbImg');
+                const lbTitle = document.getElementById('lbTitle');
+                const lbCaption = document.getElementById('lbCaption');
+                const lbCounter = document.getElementById('lbCounter');
+                let items = [],
+                    cur = 0;
 
-          function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+                function esc(s) {
+                    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+                }
 
-          function renderGallery(){
-            if(!items.length){sec.style.display='none';return;}
-            sec.style.display='block';
-            grid.innerHTML=items.map((item,i)=>`
+                function renderGallery() {
+                    if (!items.length) {
+                        sec.style.display = 'none';
+                        return;
+                    }
+                    sec.style.display = 'block';
+                    grid.innerHTML = items.map((item, i) => `
               <div class="g-item reveal" data-idx="${i}">
                 <img src="${esc(item.imageUrl)}" alt="${esc(item.title)}" loading="lazy">
                 <div class="ov">
